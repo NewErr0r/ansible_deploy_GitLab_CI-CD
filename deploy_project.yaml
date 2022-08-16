@@ -4,4 +4,6 @@
   become: true 
 
   roles:
-    - role-install-GitLab
+#    - role-install-GitLab
+#    - role-GitLab-Runner
+    - role-setting-rsync

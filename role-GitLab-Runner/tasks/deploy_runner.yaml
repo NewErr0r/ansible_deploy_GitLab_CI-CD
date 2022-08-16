@@ -1,0 +1,9 @@
+- name: Configuring the Repository
+  script: script.rpm.sh
+
+- name: Install gitlab-runner
+  dnf: 
+    name: gitlab-runner
+    state: latest
+  notify: 
+    - Started and Enabled gitlab-runner

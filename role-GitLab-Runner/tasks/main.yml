@@ -1,0 +1,5 @@
+---
+- name: Install Runner on server GitLab
+  include_tasks: deploy_runner.yaml
+  when:
+    - inventory_hostname == "Git"

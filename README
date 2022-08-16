@@ -1,0 +1,65 @@
+1. Изменить настройки инвентарного файла:
+
+# vim hosts
+  [Gitlab]
+  Git ansible_ssh_host=192.168.0.170      # Указать ip, имя не менять!
+
+  [Web]
+  Web01 ansible_ssh_host=192.168.0.171
+  Web02 ansible_ssh_host=192.168.0.172
+
+2. Для установки локального GitLab раскомментировать роль "role-install-GitLab" в файле:
+
+# vim deploy_project.yaml
+
+    roles:
+      #- role-install-GitLab
+      #- role-GitLab-Runner
+
+3. Для установки локального GitLab-Runner раскомментировать роль "role-GitLab-Runner" в файле:
+
+# vim deploy_project.yaml
+
+    roles:
+      #- role-install-GitLab
+      #- role-GitLab-Runner
+
+4. Регистрация
+
+Для корректной работы Runner его нужно связать с нашим проектом в GitLab. Для этого сначала заходим на портал последнего - переходим на страницу проекта - в меню слева выбираем Settings - CI / CD:
+Находим раздел Runners:
+Справа от названия кликаем по Expand:
+Находим параметры для регистрации нового раннера:
+... и оставляем страницу открытой — она понадобиться на следующем шаге.
+
+В командной строке нашего сервера GitLab вводим:
+
+gitlab-runner register
+
+* установить и запустить Runner можно не только на локальном сервере GitLab, но мы рассмотрим только данный способ.
+
+Система в интерактивном режиме запросит данные для регистрации — вводим их:
+
+Enter the GitLab instance URL (for example, https://gitlab.com/):
+https://gitlab.dmosk.ru/
+Enter the registration token:
+zX_Kvkxk7ywrgwYHsod5
+Enter a description for the runner:
+[git-server.dmoks.ru]: DMOSK Metrics API
+Enter tags for the runner (comma-separated):
+dmosk, metrics, api
+Registering runner... succeeded                     runner=zX_Kvkxk
+Enter an executor: parallels, virtualbox, docker+machine, docker-ssh+machine, kubernetes, custom, docker, docker-ssh, shell, ssh:
+shell
+
+* где:
+
+    https://gitlab.dmosk.ru/ — адрес нашего сервера GitLab. Его можно увидеть на странице с параметрами, которую мы оставили открытой на предыдущем шаге. В моем случае, на данной странице ссылка была типа http, однако, при регистрации Runner мы ее должны поменять на https (если наш сервер использует его).
+    zX_Kvkxk7ywrgwYHsod5 — токен для регистрации раннера. Его смотрим на странице с параметрами, которые мы открывали выше.
+    DMOSK Metrics API — произвольное описание для нашего раннера.
+    dmosk, metrics, api — теги. Рекомендуется максимально точно описывать раннер тегами.
+    shell — выбираем исполнителя из предложенных вариантов. В нашем случае это просто командный интерпретатор.
+
+В конце мы должны увидеть:
+
+Runner registered successfully. Feel free to start it, but if it's running already the config should be automatically reloaded!
