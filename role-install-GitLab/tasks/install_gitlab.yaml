@@ -1,0 +1,41 @@
+- name: Permissions for Firewalld
+  firewalld:
+    service: "{{ item }}" 
+    permanent: yes
+    state: enabled 
+  loop:
+    - http
+    - https
+  notify: Restart Firewalld
+
+- name: Install packages
+  dnf:
+    name: "{{ packages_install }}"
+    state: latest
+
+- name: Running the gitlab-ce script
+  script: script.rpm.sh
+
+- name: Install "GitLab-ce"
+  dnf:
+    name: gitlab-ce 
+    state: latest
+
+- name: Configurations Web-Interface
+  template: 
+    src: gitlab.rb.j2
+    dest: "{{ configure_web_interface }}" 
+
+- name: Reconfigure GitLab 
+  shell: gitlab-ctl reconfigure 
+
+- name: Check password for "root" in out Web-Interface
+  command: bash -c "cat /etc/gitlab/initial_root_password | head -n7 | tail -n1"
+  register: password
+
+- debug: 
+    var: password.stdout_lines
+
+- debug:
+    msg:
+      - "Open the browser 'http://{{ ansible_ssh_host }}"

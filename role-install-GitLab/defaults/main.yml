@@ -1,0 +1,12 @@
+---
+packages_install: 
+  - curl
+  - policycoreutils
+
+external_url: "http://{{ ansible_ssh_host }}"
+
+packages: 
+  - curl
+  - ca-certificates 
+  - apt-transport-https
+  - gnupg2

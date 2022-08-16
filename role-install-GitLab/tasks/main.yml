@@ -1,0 +1,5 @@
+---
+- name: Install GitLab 
+  include_tasks: install_gitlab.yaml
+  when:
+    - inventory_hostname == "Git"

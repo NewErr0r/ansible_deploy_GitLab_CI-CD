@@ -1,0 +1,7 @@
+---
+- name: Configuring CI/CD in GitLab to synchronize the project with web servers
+  hosts: all
+  become: true 
+
+  roles:
+    - role-install-GitLab
