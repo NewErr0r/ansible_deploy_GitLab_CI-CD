@@ -1,0 +1,78 @@
+---
+- name: Rsyncd Setup on web servers
+  hosts: Web
+  become: true 
+
+  vars: # for "rsyncd.conf"
+    instance_name: "champ"
+    path: /var/www/{{ instance_name }}/www
+    comment: "Site champ.first"
+    auth_users: "rsync_champ"
+    password: "P@ssw0rd"
+
+  tasks: 
+    - name: Install packages Rsync 
+      dnf: 
+        name: "{{ packages }}" 
+        state: latest 
+      vars: 
+        packages: 
+          - rsync 
+          - rsync-daemon
+
+    - name: Started and Enabled Rsyncd
+      service:
+        name: rsyncd 
+        enabled: true 
+        state: started 
+
+    - name: Configure "rsyncd.conf"
+      template: 
+        src: ./rsyncd.conf.j2
+        dest: /etc/rsyncd.conf
+
+    - name: Configure "rsyncd.scrt"
+      template: 
+        src: ./rsyncd.scrt.j2
+        dest: /etc/rsyncd.scrt
+      notify:
+        - Restarted Rsyncd
+    
+    - name: Configure Firewalld
+      firewalld:
+        port: "873/tcp"
+        permanent: yes 
+        state: enabled 
+      notify:
+        - Restarted Firewalld
+
+  handlers: 
+    - name: Restarted Firewalld
+      service: 
+        name: firewalld 
+        state: restarted
+
+    - name: Restarted Rsyncd
+      service: 
+        name: rsyncd
+        state: restarted
+
+- name: Settings Rsync on GitLab Server
+  hosts: Git 
+  become: true 
+
+  vars: 
+    password: "P@ssw0rd"
+
+  tasks: 
+    - name: Install Rsync
+      dnf: 
+        name: rsync 
+        state: latest
+        
+    - name: Setting password rsync 
+      shell:  |
+        touch /etc/rsyncd.scrt 
+        echo '{{ password }}' > /etc/rsyncd.scrt
+        chmod 640 /etc/rsyncd.scrt
+        chown :gitlab-runner /etc/rsyncd.scrt

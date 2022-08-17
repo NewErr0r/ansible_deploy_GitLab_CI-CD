@@ -1,0 +1,17 @@
+max connections = 10
+exclude = lost+found/ .gitlab-ci.yml
+dont compress   = *.gz *.tgz *.zip *.z *.Z *.rpm *.deb *.bz2 *.rar *.7z *.mp3 *.jpg
+
+[{{ instance_name }}]
+    path = {{ path }} 
+    comment = {{ comment }}
+    uid = apache
+    gid = apache
+    read only = no
+    list = yes
+    auth users = {{ auth_users }}
+    secrets file = /etc/rsyncd.scrt
+    #pre-xfer exec =
+    #post-xfer exec =
+    hosts allow = localhost 192.168.0.170
+    hosts deny = *
